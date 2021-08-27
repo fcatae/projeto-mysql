@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="94625f06-953d-431e-8d40-f520bcedf25d" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="0f8f535f-5530-455a-8972-e9e870257fcc" >
+		<db:my-sql-connection host="${sql.host}" port="${sql.port}" user="${sql.user}" password="${sql.pass}" database="${sql.db}" />
+	</db:config>
+	<flow name="workshop-mysqlFlow" doc:id="f27ffe1a-0f62-48e2-acdc-73c11198a87c" >
+		<http:listener doc:name="Listener" doc:id="3c9e96cd-c8a8-45ed-911e-cab10ff35d36" config-ref="HTTP_Listener_config" path="/*"/>
+		<db:select doc:name="Select" doc:id="9f669e3c-61bd-4bb8-9f43-e265d1aa39ad" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM product LIMIT 10]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="48932235-0ae6-4298-862b-5a65a032391f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
